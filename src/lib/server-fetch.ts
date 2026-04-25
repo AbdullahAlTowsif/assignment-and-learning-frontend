@@ -21,7 +21,6 @@ const serverFetchHelper = async (endpoint: string, options: RequestInit): Promis
             ...headers,
             // ...(accessToken ? { "Authorization": `Bearer ${accessToken}` } : {}),
             // ...(accessToken ? { "Authorization": accessToken } : {}),
-            // cookie nije theke set kortesi karon node js er backend theke direct browser e cookie set hocche na. Node Backend --> Next.js Backend --> client Browser
         },
         credentials: 'include',
         ...restOptions,
