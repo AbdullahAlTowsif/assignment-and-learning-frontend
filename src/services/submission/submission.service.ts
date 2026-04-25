@@ -31,7 +31,7 @@ export const createSubmission = async (data: any) => {
 
 export const getMySubmissions = async () => {
     try {
-        const res = await serverFetch.get("/submission/my");
+        const res = await serverFetch.get("/submission/my-submissions");
 
         const result = await res.json();
         return result;
