@@ -136,7 +136,7 @@ export default function StudentAssignmentsTable({
                                     <td className="px-6 py-5">
                                         <div className="max-w-xs">
                                             <Link
-                                                href={`/student/assignments/${assignment.id}`}
+                                                href={`/dashboard/assignments/${assignment.id}`}
                                                 className="text-white text-[14px] font-medium hover:text-emerald-400 transition-colors line-clamp-1"
                                             >
                                                 {assignment.title}
