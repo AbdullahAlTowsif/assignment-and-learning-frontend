@@ -18,18 +18,13 @@ const navItems: NavItem[] = [
         roles: ["INSTRUCTOR"],
     },
     {
-        href: "/student/dashboard",
-        label: "My Progress",
+        href: "/dashboard/assignments",
+        label: "Assignments",
         roles: ["STUDENT"],
     },
     {
         href: "/instructor/dashboard/create-assignment",
         label: "Create Assignment",
-        roles: ["INSTRUCTOR"],
-    },
-    {
-        href: "/instructor/dashboard",
-        label: "Dashboard",
         roles: ["INSTRUCTOR"],
     },
     {
