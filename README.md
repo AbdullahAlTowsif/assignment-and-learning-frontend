@@ -1,36 +1,162 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎓 Assignment & Learning Analytics Platform
 
-## Getting Started
+A full-stack **Next.js + Node.js + PostgreSQL (Prisma)** application designed to bridge the gap between **instruction and evaluation**.
 
-First, run the development server:
+This platform enables **Instructors** to manage assignments, analyze student performance, and leverage AI tools — while **Students** can track progress, submit work, and improve through feedback.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🚀 Live Features
+
+### 👨‍🏫 Instructor
+- Create, update, delete assignments
+- Review student submissions
+- Provide feedback & update status
+- AI-powered assistance:
+  - ✨ Generate feedback automatically
+  - ✨ Improve assignment descriptions
+- 📊 Analytics Dashboard:
+  - Submission status distribution
+  - Acceptance rate
+  - Submissions per assignment
+  - Difficulty vs performance
+
+### 🎓 Student
+- Browse assignments
+- Submit work (URL + note)
+- Track submission status
+- View instructor feedback in real-time
+
+---
+
+## 🧠 Smart AI Features
+- AI-generated feedback using OpenRouter API
+- Assignment description enhancement
+- Fallback logic for reliability
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS + ShadCN UI
+- React Query
+
+### Backend
+- Node.js + Express.js
+- TypeScript
+- PostgreSQL + Prisma ORM
+- JWT Authentication
+
+### AI Integration
+- OpenRouter API (LLM)
+
+---
+
+## 🔐 Authentication & Security
+- JWT-based authentication
+- Role-based access control:
+  - STUDENT
+  - INSTRUCTOR
+- Protected routes
+
+---
+
+## 📊 Analytics Features
+- Submission Status Count
+- Acceptance Rate Calculation
+- Submissions per Assignment
+- Difficulty vs Performance Insights
+
+---
+
+## 📂 Project Structure
+
+### Backend
+```
+src/
+ ├── modules/
+ │    ├── assignment/
+ │    ├── submission/
+ │    ├── analytics/
+ │    ├── smart/
+ │    ├── user/
+ ├── middleware/
+ ├── utils/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Frontend
+```
+src/
+ ├── services/
+ ├── hooks/
+ ├── components/
+ ├── app/
+ ├── zod/
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚙️ Installation
 
-## Learn More
+### 1. Clone the repo
+```bash
+git clone https://github.com/AbdullahAlTowsif/assignment-and-learning-frontend
+cd assignment-and-learning-frontend
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Backend Setup
+```bash
+cd backend
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create `.env`:
+```
+DATABASE_URL=
+NODE_ENV=
+PORT=
+BCRYPT_SALT_ROUND=
+JWT_ACCESS_SECRET=
+JWT_ACCESS_EXPIRES=
+JWT_REFRESH_SECRET=
+JWT_REFRESH_EXPIRES=
+OPENROUTER_API_KEY=
+OPENROUTER_BASE_URL=
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run:
+```bash
+npx prisma migrate dev
+npx prisma generate
+npm run dev
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 3. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🧪 Future Improvements
+- Real-time notifications
+- File uploads instead of URLs
+- AI-powered grading
+- Student performance prediction
+
+---
+
+## 👨‍💻 Author
+**Abdullah Al Towsif**
+
+---
+
+## ⭐ If you like this project
+Give it a star ⭐ on GitHub!
