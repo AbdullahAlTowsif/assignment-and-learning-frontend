@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -16,10 +15,10 @@ import {
     TrendingUp,
     BarChart3,
 } from "lucide-react";
-import { IAssignment, ISubmission, Status, Level } from "@/types/assignment.interface";
+import { IAssignment, ISubmission } from "@/types/assignment.interface";
 import { getSingleAssignment } from "@/services/assignment/assignment.service";
+import { getSubmissionsByAssignment } from "@/services/submission/submission.service";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import EditAssignmentDialog from "./EditAssignmentDialog";
 import SubmissionDetailsDialog from "../Submission/SubmissionDetailsDialog";
@@ -33,19 +32,16 @@ const difficultyConfig = {
         label: "Beginner",
         classes: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
         dot: "bg-emerald-400",
-        icon: "🟢",
     },
     INTERMEDIATE: {
         label: "Intermediate",
         classes: "bg-amber-500/10 text-amber-400 border-amber-500/20",
         dot: "bg-amber-400",
-        icon: "🟡",
     },
     ADVANCED: {
         label: "Advanced",
         classes: "bg-red-500/10 text-red-400 border-red-500/20",
         dot: "bg-red-400",
-        icon: "🔴",
     },
 };
 
@@ -69,6 +65,7 @@ const statusConfig = {
 
 export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetailsPageProps) {
     const [assignment, setAssignment] = useState<IAssignment | null>(null);
+    const [submissions, setSubmissions] = useState<ISubmission[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -77,26 +74,39 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
     const [selectedSubmission, setSelectedSubmission] = useState<ISubmission | null>(null);
     const [submissionDialogOpen, setSubmissionDialogOpen] = useState(false);
 
-    const fetchAssignment = async () => {
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/immutability
+        fetchAssignmentAndSubmissions();
+    }, [assignmentId]);
+
+    const fetchAssignmentAndSubmissions = async () => {
         setLoading(true);
         setError(null);
         try {
-            const result = await getSingleAssignment(assignmentId);
-            if (result.success) {
-                setAssignment(result.data);
+            const [assignmentResult, submissionsResult] = await Promise.all([
+                getSingleAssignment(assignmentId),
+                getSubmissionsByAssignment(assignmentId),
+            ]);
+
+            if (assignmentResult.success) {
+                setAssignment(assignmentResult.data);
             } else {
-                setError(result.message || "Failed to load assignment");
+                setError(assignmentResult.message || "Failed to load assignment");
+            }
+
+            if (submissionsResult.success) {
+                setSubmissions(submissionsResult.data || []);
+            } else {
+                console.error("Failed to load submissions:", submissionsResult.message);
+                // Don't set error here, just log it - submissions might be empty
             }
         } catch (error) {
             setError("An error occurred while fetching assignment details");
+            console.error("Fetch error:", error);
         } finally {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        void Promise.resolve().then(fetchAssignment);
-    }, [assignmentId]);
 
     const handleUpdateAssignment = (updatedAssignment: IAssignment) => {
         setAssignment((prev) =>
@@ -138,10 +148,6 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
     };
 
     const getSubmissionStats = () => {
-        if (!assignment?.submissions) return { total: 0, pending: 0, accepted: 0, needsImprovement: 0 };
-
-        const submissions = assignment.submissions;
-        console.log("submission", submissions);
         return {
             total: submissions.length,
             pending: submissions.filter((s) => s.status === "PENDING").length,
@@ -192,20 +198,20 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-white/30 text-[12px] mb-8">
                 <Link
-                    href="/"
+                    href="/instructor/dashboard"
                     className="hover:text-white/60 transition-colors"
                 >
-                    Home
+                    Dashboard
                 </Link>
                 <span>/</span>
                 <Link
-                    href="/instructor/my-assignments"
+                    href="/instructor/assignments"
                     className="hover:text-white/60 transition-colors"
                 >
                     Assignments
                 </Link>
                 <span>/</span>
-                <span className="text-white/50">{assignment.title}</span>
+                <span className="text-white/50 truncate max-w-50">{assignment.title}</span>
             </div>
 
             {/* Header */}
@@ -250,7 +256,7 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
                             <Pencil className="w-4 h-4 mr-2" />
                             Edit
                         </Button>
-                        <Link href="/instructor/dashboard/my-assignments">
+                        <Link href="/instructor/assignments">
                             <Button variant="outline" className="border border-white/10 text-white/50 hover:text-white/80 hover:border-white/20 bg-transparent">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
                                 Back
@@ -286,7 +292,9 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
 
                         {stats.total === 0 ? (
                             <div className="text-center py-12">
-                                <Users className="w-12 h-12 text-white/10 mx-auto mb-3" />
+                                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3">
+                                    <Users className="w-6 h-6 text-white/10" />
+                                </div>
                                 <p className="text-white/40 text-[14px]">
                                     No submissions yet
                                 </p>
@@ -296,8 +304,11 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {assignment.submissions?.map((submission) => {
+                                {submissions.map((submission) => {
                                     const status = statusConfig[submission.status];
+                                    const studentName = submission.student?.name || submission.student?.email || "Unknown Student";
+                                    const studentInitial = studentName.charAt(0).toUpperCase();
+
                                     return (
                                         <div
                                             key={submission.id}
@@ -305,20 +316,26 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
                                             onClick={() => handleViewSubmission(submission)}
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center">
+                                                <div className="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center shrink-0">
                                                     <span className="text-violet-400 text-[13px] font-semibold">
-                                                        {submission.student?.name?.charAt(0)?.toUpperCase() ||
-                                                            submission.student?.email?.charAt(0)?.toUpperCase() ||
-                                                            "S"}
+                                                        {studentInitial}
                                                     </span>
                                                 </div>
                                                 <div>
                                                     <p className="text-white text-[14px] font-medium">
-                                                        {submission.student?.name || submission.student?.email || "Unknown Student"}
+                                                        {studentName}
                                                     </p>
                                                     <p className="text-white/30 text-[12px]">
                                                         Submitted {formatDate(submission.submittedAt)}
                                                     </p>
+                                                    {submission.feedback && (
+                                                        <div className="flex items-center gap-1 mt-1">
+                                                            <CheckCircle className="w-3 h-3 text-emerald-400" />
+                                                            <span className="text-emerald-400 text-[11px]">
+                                                                Feedback given
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -376,44 +393,35 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
                                 </span>
                             </div>
 
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-white/40 text-[13px]">
-                                    <Users className="w-4 h-4" />
-                                    Total Submissions
+                            <div className="border-t border-white/6 pt-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white/40 text-[13px]">Total Submissions</span>
+                                    <span className="text-white font-semibold">{stats.total}</span>
                                 </div>
-                                <span className="text-white text-[13px] font-semibold">
-                                    {stats.total}
-                                </span>
                             </div>
 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-white/40 text-[13px]">
-                                    <Clock className="w-4 h-4" />
+                                    <Clock className="w-4 h-4 text-amber-400" />
                                     Pending Reviews
                                 </div>
-                                <span className="text-amber-400 text-[13px] font-semibold">
-                                    {stats.pending}
-                                </span>
+                                <span className="text-amber-400 font-semibold">{stats.pending}</span>
                             </div>
 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-white/40 text-[13px]">
-                                    <CheckCircle className="w-4 h-4" />
+                                    <CheckCircle className="w-4 h-4 text-emerald-400" />
                                     Accepted
                                 </div>
-                                <span className="text-emerald-400 text-[13px] font-semibold">
-                                    {stats.accepted}
-                                </span>
+                                <span className="text-emerald-400 font-semibold">{stats.accepted}</span>
                             </div>
 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-white/40 text-[13px]">
-                                    <AlertCircle className="w-4 h-4" />
+                                    <AlertCircle className="w-4 h-4 text-red-400" />
                                     Needs Improvement
                                 </div>
-                                <span className="text-red-400 text-[13px] font-semibold">
-                                    {stats.needsImprovement}
-                                </span>
+                                <span className="text-red-400 font-semibold">{stats.needsImprovement}</span>
                             </div>
                         </div>
                     </div>
@@ -488,9 +496,11 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
             {selectedSubmission && (
                 <SubmissionDetailsDialog
                     submission={selectedSubmission}
+                    assignmentTitle={assignment.title}
+                    assignmentDescription={assignment.description}
                     open={submissionDialogOpen}
                     onOpenChange={setSubmissionDialogOpen}
-                    onRefresh={fetchAssignment}
+                    onRefresh={fetchAssignmentAndSubmissions}
                 />
             )}
         </div>

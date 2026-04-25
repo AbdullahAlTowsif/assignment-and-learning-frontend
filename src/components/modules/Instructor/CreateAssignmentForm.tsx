@@ -9,6 +9,8 @@ import InputFieldError from "@/components/shared/InputFieldError";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createAssignment } from "@/services/assignment/assignment.service";
+import AIDescriptionImprover from "@/components/modules/Smart/AIDescriptionImprover";
+import { Sparkles } from "lucide-react";
 
 const difficultyLevels = [
     { value: "BEGINNER", label: "Beginner" },
@@ -18,10 +20,13 @@ const difficultyLevels = [
 
 const CreateAssignmentForm = () => {
     const [state, formAction, isPending] = useActionState(createAssignment, null);
-    console.log("create assignment state", state);
     const [difficulty, setDifficulty] = useState<string>(
-        (state?.formData?.difficulty as string) || "BEGINNER"
+        (state?.formData?.difficulty as string) || "INTERMEDIATE"
     );
+    const [title, setTitle] = useState<string>((state?.formData?.title as string) || "");
+    const [description, setDescription] = useState<string>((state?.formData?.description as string) || "");
+    const [deadline, setDeadline] = useState<string>((state?.formData?.deadline as string) || "");
+    const [showAITools, setShowAITools] = useState(false);
 
     useEffect(() => {
         if (state && !state.success && state.message) {
@@ -29,6 +34,13 @@ const CreateAssignmentForm = () => {
         }
         if (state && state.success && state.message) {
             toast.success(state.message);
+            // Reset form asynchronously to avoid cascading renders
+            Promise.resolve().then(() => {
+                setTitle("");
+                setDescription("");
+                setDifficulty("INTERMEDIATE");
+                setDeadline("");
+            });
         }
     }, [state]);
 
@@ -52,16 +64,7 @@ const CreateAssignmentForm = () => {
                         </FieldLabel>
                         <div className="relative mt-1.5">
                             <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="rgba(255,255,255,0.3)"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                                     <polyline points="14 2 14 8 20 8" />
                                     <line x1="16" y1="13" x2="8" y2="13" />
@@ -73,7 +76,8 @@ const CreateAssignmentForm = () => {
                                 name="title"
                                 type="text"
                                 placeholder="e.g., Introduction to React Hooks"
-                                defaultValue={(state?.formData?.title as string) || ""}
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white text-[14px] placeholder:text-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.07] transition-all duration-200"
                             />
                         </div>
@@ -85,43 +89,22 @@ const CreateAssignmentForm = () => {
 
                     {/* Difficulty Level */}
                     <Field>
-                        <FieldLabel
-                            htmlFor="difficulty"
-                            className="text-white/60 text-[13px] font-medium"
-                        >
+                        <FieldLabel htmlFor="difficulty" className="text-white/60 text-[13px] font-medium">
                             Difficulty Level <span className="text-violet-400">*</span>
                         </FieldLabel>
                         <div className="mt-1.5">
-                            <Input
-                                id="difficulty"
-                                name="difficulty"
-                                type="hidden"
-                                value={difficulty}
-                                readOnly
-                            />
-                            <Select
-                                value={difficulty}
-                                onValueChange={(value) => setDifficulty(value)}
-                            >
+                            <Input id="difficulty" name="difficulty" type="hidden" value={difficulty} readOnly />
+                            <Select value={difficulty} onValueChange={(value) => setDifficulty(value)}>
                                 <SelectTrigger className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-[14px] placeholder:text-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.07] transition-all duration-200">
                                     <SelectValue placeholder="Select difficulty" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-[#1A1A24] border-white/10 text-white">
                                     {difficultyLevels.map((level) => (
-                                        <SelectItem
-                                            key={level.value}
-                                            value={level.value}
-                                            className="focus:bg-violet-500/20 focus:text-white cursor-pointer"
-                                        >
+                                        <SelectItem key={level.value} value={level.value} className="focus:bg-violet-500/20 focus:text-white cursor-pointer">
                                             <div className="flex items-center gap-2">
-                                                <span
-                                                    className={`w-1.5 h-1.5 rounded-full ${level.value === "BEGINNER"
-                                                            ? "bg-emerald-400"
-                                                            : level.value === "INTERMEDIATE"
-                                                                ? "bg-amber-400"
-                                                                : "bg-red-400"
-                                                        }`}
-                                                />
+                                                <span className={`w-1.5 h-1.5 rounded-full ${level.value === "BEGINNER" ? "bg-emerald-400" :
+                                                        level.value === "INTERMEDIATE" ? "bg-amber-400" : "bg-red-400"
+                                                    }`} />
                                                 {level.label}
                                             </div>
                                         </SelectItem>
@@ -134,24 +117,12 @@ const CreateAssignmentForm = () => {
 
                     {/* Deadline */}
                     <Field>
-                        <FieldLabel
-                            htmlFor="deadline"
-                            className="text-white/60 text-[13px] font-medium"
-                        >
+                        <FieldLabel htmlFor="deadline" className="text-white/60 text-[13px] font-medium">
                             Deadline <span className="text-violet-400">*</span>
                         </FieldLabel>
                         <div className="relative mt-1.5">
                             <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="rgba(255,255,255,0.3)"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                                     <line x1="16" y1="2" x2="16" y2="6" />
                                     <line x1="8" y1="2" x2="8" y2="6" />
@@ -163,7 +134,8 @@ const CreateAssignmentForm = () => {
                                 name="deadline"
                                 type="datetime-local"
                                 min={getMinDateTime()}
-                                defaultValue={(state?.formData?.deadline as string) || ""}
+                                value={deadline}
+                                onChange={(e) => setDeadline(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white text-[14px] placeholder:text-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.07] transition-all duration-200 scheme-dark"
                             />
                         </div>
@@ -173,26 +145,24 @@ const CreateAssignmentForm = () => {
                         <InputFieldError field="deadline" state={state} />
                     </Field>
 
-                    {/* Description */}
+                    {/* Description with AI Improver */}
                     <Field className="md:col-span-2">
-                        <FieldLabel
-                            htmlFor="description"
-                            className="text-white/60 text-[13px] font-medium"
-                        >
-                            Description <span className="text-violet-400">*</span>
-                        </FieldLabel>
+                        <div className="flex items-center justify-between">
+                            <FieldLabel htmlFor="description" className="text-white/60 text-[13px] font-medium">
+                                Description <span className="text-violet-400">*</span>
+                            </FieldLabel>
+                            <button
+                                type="button"
+                                onClick={() => setShowAITools(!showAITools)}
+                                className="flex items-center gap-1.5 text-violet-400 hover:text-violet-300 text-[12px] font-medium transition-colors"
+                            >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                {showAITools ? "Hide AI Tools" : "AI Tools"}
+                            </button>
+                        </div>
                         <div className="relative mt-1.5">
                             <div className="absolute left-3 top-3 pointer-events-none">
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="rgba(255,255,255,0.3)"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>
@@ -202,42 +172,49 @@ const CreateAssignmentForm = () => {
                                 name="description"
                                 placeholder="Describe the assignment objectives, requirements, submission guidelines, and evaluation criteria in detail..."
                                 rows={6}
-                                defaultValue={(state?.formData?.description as string) || ""}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-white text-[14px] placeholder:text-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.07] transition-all duration-200 resize-none"
                             />
                         </div>
                         <FieldDescription className="text-white/25 text-[11px] mt-1.5">
-                            Minimum 20 characters. Include clear instructions, requirements, and any
-                            helpful resources.
+                            Minimum 20 characters. Include clear instructions, requirements, and any helpful resources.
                         </FieldDescription>
                         <InputFieldError field="description" state={state} />
+
+                        {/* AI Description Improver */}
+                        {showAITools && (
+                            <div className="mt-4 p-4 rounded-xl bg-violet-500/5 border border-violet-500/10">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Sparkles className="w-4 h-4 text-violet-400" />
+                                    <span className="text-violet-300 text-[13px] font-medium">
+                                        AI Description Improver
+                                    </span>
+                                </div>
+                                <AIDescriptionImprover
+                                    currentTitle={title || "Untitled Assignment"}
+                                    currentDescription={description}
+                                    difficulty={difficulty}
+                                    onDescriptionImproved={(improved) => setDescription(improved)}
+                                />
+                            </div>
+                        )}
                     </Field>
 
-                    {/* Assignment Preview Card */}
+                    {/* AI Feedback Info Card */}
                     <Field className="md:col-span-2">
-                        <div className="mt-1 p-4 rounded-xl bg-white/2 border border-white/5">
+                        <div className="mt-1 p-4 rounded-xl bg-linear-to-r from-violet-500/5 to-emerald-500/5 border border-white/5">
                             <div className="flex items-start gap-3">
                                 <div className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center shrink-0">
-                                    <svg
-                                        width="15"
-                                        height="15"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#a78bfa"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                                    </svg>
+                                    <Sparkles className="w-4 h-4 text-violet-400" />
                                 </div>
                                 <div>
                                     <p className="text-violet-300 text-[13px] font-medium mb-1">
-                                        AI Feedback Ready
+                                        AI-Powered Features
                                     </p>
                                     <p className="text-white/30 text-[12px] leading-relaxed">
-                                        This assignment will automatically generate AI-powered feedback
-                                        for student submissions, saving you hours of manual review time.
+                                        This assignment will automatically enable AI feedback generation for student submissions.
+                                        Use the AI Tools button above to improve your description.
                                     </p>
                                 </div>
                             </div>
@@ -255,44 +232,17 @@ const CreateAssignmentForm = () => {
                         >
                             {isPending ? (
                                 <>
-                                    <svg
-                                        className="animate-spin h-4 w-4"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        />
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                        />
+                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                                     </svg>
                                     Creating Assignment...
                                 </>
                             ) : (
                                 <>
                                     Publish Assignment
-                                    <svg
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 14 14"
-                                        fill="none"
-                                        className="group-hover:translate-x-0.5 transition-transform"
-                                    >
-                                        <path
-                                            d="M2 7H12M8 3L12 7L8 11"
-                                            stroke="currentColor"
-                                            strokeWidth="1.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:translate-x-0.5 transition-transform">
+                                        <path d="M2 7H12M8 3L12 7L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 </>
                             )}
@@ -300,7 +250,12 @@ const CreateAssignmentForm = () => {
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => setDifficulty("BEGINNER")}
+                            onClick={() => {
+                                setTitle("");
+                                setDescription("");
+                                setDifficulty("INTERMEDIATE");
+                                setDeadline("");
+                            }}
                             className="px-6 py-3 rounded-xl border border-white/10 text-white/50 hover:text-white/80 hover:border-white/20 bg-transparent transition-all duration-200"
                         >
                             Reset Form
