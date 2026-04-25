@@ -256,7 +256,7 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
                             <Pencil className="w-4 h-4 mr-2" />
                             Edit
                         </Button>
-                        <Link href="/instructor/assignments">
+                        <Link href="/instructor/dashboard/my-assignments">
                             <Button variant="outline" className="border border-white/10 text-white/50 hover:text-white/80 hover:border-white/20 bg-transparent">
                                 <ArrowLeft className="w-4 h-4 mr-2" />
                                 Back
