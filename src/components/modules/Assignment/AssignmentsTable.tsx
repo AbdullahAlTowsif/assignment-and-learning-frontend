@@ -46,7 +46,7 @@ export default function AssignmentsTable({
     const isDeadlinePassed = (deadline: string) => {
         return new Date(deadline) < new Date();
     };
-
+    console.log("assignments", assignments);
     return (
         <div className="bg-[#111118]/80 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
             {/* Table Header */}
@@ -74,7 +74,7 @@ export default function AssignmentsTable({
                                 Deadline
                             </th>
                             <th className="text-left px-6 py-4 text-white/40 text-[12px] font-medium uppercase tracking-wider">
-                                Submissions
+                                Instructor
                             </th>
                             <th className="text-left px-6 py-4 text-white/40 text-[12px] font-medium uppercase tracking-wider">
                                 Status
@@ -88,7 +88,6 @@ export default function AssignmentsTable({
                         {assignments.map((assignment) => {
                             const difficulty = difficultyConfig[assignment.difficulty];
                             const passed = isDeadlinePassed(assignment.deadline);
-                            const submissionCount = assignment.submissions?.length || 0;
 
                             return (
                                 <tr
@@ -147,11 +146,11 @@ export default function AssignmentsTable({
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-2">
                                             <span className="text-white text-[14px] font-semibold">
-                                                {submissionCount}
+                                                {assignment.instructor?.name}
                                             </span>
-                                            <span className="text-white/30 text-[12px]">
+                                            {/* <span className="text-white/30 text-[12px]">
                                                 {submissionCount === 1 ? "submission" : "submissions"}
-                                            </span>
+                                            </span> */}
                                         </div>
                                     </td>
 
