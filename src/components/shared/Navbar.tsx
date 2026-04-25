@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
         roles: ["INSTRUCTOR"],
     },
     {
-        href: "/instructor/analytics",
+        href: "/instructor/dashboard/analytics",
         label: "Analytics",
         roles: ["INSTRUCTOR"],
     },

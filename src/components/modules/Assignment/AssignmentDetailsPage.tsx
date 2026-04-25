@@ -141,6 +141,7 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
         if (!assignment?.submissions) return { total: 0, pending: 0, accepted: 0, needsImprovement: 0 };
 
         const submissions = assignment.submissions;
+        console.log("submission", submissions);
         return {
             total: submissions.length,
             pending: submissions.filter((s) => s.status === "PENDING").length,
@@ -191,14 +192,14 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-white/30 text-[12px] mb-8">
                 <Link
-                    href="/instructor/dashboard"
+                    href="/"
                     className="hover:text-white/60 transition-colors"
                 >
-                    Dashboard
+                    Home
                 </Link>
                 <span>/</span>
                 <Link
-                    href="/instructor/assignments"
+                    href="/instructor/my-assignments"
                     className="hover:text-white/60 transition-colors"
                 >
                     Assignments

@@ -267,7 +267,7 @@ export default function AssignmentsPage() {
                             : "Try adjusting your search criteria"}
                     </p>
                     {assignments.length === 0 && (
-                        <Link href="/instructor/assignments/create">
+                        <Link href="/instructor/dashboard/create-assignment">
                             <Button className="group flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-[14px] font-semibold px-5 py-2.5 rounded-xl transition-all duration-200">
                                 <Plus className="w-4 h-4" />
                                 Create Your First Assignment

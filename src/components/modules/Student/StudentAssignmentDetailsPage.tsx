@@ -175,11 +175,11 @@ export default function StudentAssignmentDetailsPage({
         <div className="relative z-10 py-8 px-4 max-w-7xl mx-auto">
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-white/30 text-[12px] mb-8">
-                <Link href="/student/dashboard" className="hover:text-white/60 transition-colors">
-                    Dashboard
+                <Link href="/" className="hover:text-white/60 transition-colors">
+                    Home
                 </Link>
                 <span>/</span>
-                <Link href="/student/assignments" className="hover:text-white/60 transition-colors">
+                <Link href="/dashboard/assignments" className="hover:text-white/60 transition-colors">
                     Assignments
                 </Link>
                 <span>/</span>

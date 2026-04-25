@@ -99,7 +99,7 @@ export default function AssignmentsTable({
                                     <td className="px-6 py-5">
                                         <div className="max-w-xs">
                                             <Link
-                                                href={`/instructor/assignments/${assignment.id}`}
+                                                href={`/instructor/dashboard/my-assignments/${assignment.id}`}
                                                 className="text-white text-[14px] font-medium hover:text-violet-400 transition-colors line-clamp-1"
                                             >
                                                 {assignment.title}
