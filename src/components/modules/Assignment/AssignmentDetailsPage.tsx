@@ -198,14 +198,14 @@ export default function AssignmentDetailsPage({ assignmentId }: AssignmentDetail
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-white/30 text-[12px] mb-8">
                 <Link
-                    href="/instructor/dashboard"
+                    href="/"
                     className="hover:text-white/60 transition-colors"
                 >
-                    Dashboard
+                    Home
                 </Link>
                 <span>/</span>
                 <Link
-                    href="/instructor/assignments"
+                    href="/instructor/dashboard/my-assignments"
                     className="hover:text-white/60 transition-colors"
                 >
                     Assignments
