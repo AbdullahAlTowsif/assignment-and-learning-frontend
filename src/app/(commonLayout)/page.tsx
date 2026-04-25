@@ -1,5 +1,7 @@
+import FAQSection from "@/components/modules/Landing/FAQ";
 import HeroSection from "@/components/modules/Landing/HeroSection";
 import HowItWorks from "@/components/modules/Landing/HowItWorks";
+import Footer from "@/components/shared/Footer";
 import Head from "next/head";
 
 export default function Home() {
@@ -17,6 +19,8 @@ export default function Home() {
       <main>
         <HeroSection />
         <HowItWorks />
+        <FAQSection />
+        <Footer />
       </main>
     </>
   );
