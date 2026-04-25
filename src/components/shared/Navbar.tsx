@@ -13,9 +13,9 @@ export interface NavItem {
 
 const navItems: NavItem[] = [
     {
-        href: "/assignments",
+        href: "/instructor/dashboard/my-assignments",
         label: "Assignments",
-        roles: ["COMMON", "STUDENT", "INSTRUCTOR"],
+        roles: ["INSTRUCTOR"],
     },
     {
         href: "/student/dashboard",
