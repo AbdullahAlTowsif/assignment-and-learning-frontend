@@ -55,10 +55,10 @@ export const getRouteOwner = (pathname: string): "INSTRUCTOR" | "STUDENT" | "COM
 
 export const getDefaultDashboardRoute = (role: UserRole): string => {
     if (role === "INSTRUCTOR") {
-        return "/instructor/dashboard";
+        return "/instructor/dashboard/create-assignment";
     }
     if (role === "STUDENT") {
-        return "/dashboard";
+        return "/";
     }
     return "/"
 }

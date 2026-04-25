@@ -3,7 +3,6 @@ import { getUserInfo } from "@/services/auth/getUserInfo";
 import { UserInfo } from "@/types/user.interface";
 import NavbarClient from "./NavbarClient";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface NavItem {
     href: string;
@@ -11,18 +10,12 @@ export interface NavItem {
     roles: string[];
 }
 
-// ─── Nav Items ────────────────────────────────────────────────────────────────
 
 const navItems: NavItem[] = [
     {
         href: "/assignments",
         label: "Assignments",
-        roles: ["GUEST", "STUDENT", "INSTRUCTOR"],
-    },
-    {
-        href: "/ass",
-        label: "Ass",
-        roles: ["COMMON"],
+        roles: ["COMMON", "STUDENT", "INSTRUCTOR"],
     },
     {
         href: "/student/dashboard",
@@ -30,7 +23,7 @@ const navItems: NavItem[] = [
         roles: ["STUDENT"],
     },
     {
-        href: "/instructor/assignments/create",
+        href: "/instructor/dashboard/create-assignment",
         label: "Create Assignment",
         roles: ["INSTRUCTOR"],
     },
@@ -46,7 +39,6 @@ const navItems: NavItem[] = [
     },
 ];
 
-// ─── Main Navbar (async server component) ────────────────────────────────────
 
 const Navbar = async () => {
     const userInfo = (await getUserInfo()) as UserInfo;

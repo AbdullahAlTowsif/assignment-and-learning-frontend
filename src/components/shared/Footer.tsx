@@ -256,7 +256,7 @@ export default function Footer() {
                             >
                                 ♥
                             </span>
-                            by Programming Hero
+                            by Abdullah Al Towsif
                         </span>
                     </div>
                 </div>
